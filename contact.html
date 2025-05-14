@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - ATPZero</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Additional styles for contact form */
+        .contact-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #70b7ff;
+            min-height: 100vh;
+            padding: 5rem 9% 5rem;
+        }
+
+        .contact-form {
+            width: 100%;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 4rem;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .contact-form h1 {
+            font-size: 3.2rem;
+            color: #333;
+            margin-bottom: 3rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2.4rem;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1.4rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #e2e2e2;
+            font-size: 1.6rem;
+            resize: none;
+        }
+
+        .form-group textarea {
+            height: 20rem;
+        }
+
+        .char-counter {
+            font-size: 1.4rem;
+            color: #666;
+            text-align: right;
+            margin-top: 0.5rem;
+        }
+
+        #charCount {
+            color: #666;
+            /* Changed from the default to a more visible blue */
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .char-counter.limit-near {
+            color: #ff9900;
+        }
+
+        .char-counter.limit-reached {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .submit-btn {
+            display: inline-block;
+            padding: 1.4rem 2.8rem;
+            background-color: #49e400;
+            border-radius: 4rem;
+            font-size: 1.6rem;
+            color: #494949;
+            letter-spacing: 0.3rem;
+            font-weight: 600;
+            border: 2px solid #49e400;
+            transition: 0.3s ease;
+            cursor: pointer;
+            margin-top: 1.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .contact-form {
+                padding: 2rem;
+            }
+        }
+
+
+        /* Email validation styles */
+        .validation-message {
+            font-size: 1.4rem;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Add a subtle focus effect to the input fields */
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(73, 228, 0, 0.5);
+        }
+
+        /* Style for invalid input */
+        .form-group input.invalid {
+            border: 1px solid #ff0000;
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+
+        /* Success message styles */
+        .success-message {
+            background-color: #49e400;
+            color: #494949;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #494949;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 1rem;
+            vertical-align: middle;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+
+
+<body>
+    <header>
+        <a href="index.html" class="logo">ATPZero</a>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="portfolio.html">Portfolio</a>
+            <a href="projects.html">Project</a>
+            <a href="updates.html">Update</a>
+            <a href="contact.html" class="active">Contact</a>
+        </nav>
+    </header>
+
+    <section class="contact-section">
+        <div class="contact-form">
+            <h1>Contact</h1>
+            <form id="contactForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last name</label>
+                        <input type="text" id="lastName" name="lastName">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 2.4rem;">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message"></textarea>
+                    <div class="char-counter"><span id="charCount">0</span>/2000 characters</div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <span class="spinner" id="loadingSpinner"></span>
+                    <span id="submitBtnText">SEND</span>
+                </button>
+            </form>
+
+            <div class="success-message" id="successMessage">
+                Your message has been sent successfully!
+            </div>
+        </div>
+    </section>
+    <script>
+        // Check if running on localhost
+        const isLocalhost = window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname.includes('127.0.0') ||
+            window.location.hostname.includes('192.168');
+
+        // Initialize EmailJS with verification
+        (function () {
+            try {
+                // Display localhost warning if needed
+                if (isLocalhost) {
+                    console.warn("Running on localhost - EmailJS may not work properly in this environment");
+
+                    const formElement = document.querySelector('.contact-form');
+                    const localhostWarning = document.createElement('div');
+                    localhostWarning.style.backgroundColor = '#ffecb5';
+                    localhostWarning.style.color = '#856404';
+                    localhostWarning.style.padding = '1rem';
+                    localhostWarning.style.marginBottom = '2rem';
+                    localhostWarning.style.borderRadius = '5px';
+                    localhostWarning.style.fontSize = '1.6rem';
+                    localhostWarning.textContent = 'Running on localhost: Email functionality may not work properly in this environment. Form validation will still work.';
+
+                    if (formElement && formElement.firstChild) {
+                        formElement.insertBefore(localhostWarning, formElement.firstChild);
+                    }
+                }
+
+                // Check if EmailJS is properly loaded
+                if (typeof emailjs === 'undefined') {
+                    console.error("EmailJS is not defined. Make sure the script is loaded correctly.");
+                    // Create a warning at the top of the form
+                    const formElement = document.querySelector('.contact-form');
+                    const warningElement = document.createElement('div');
+                    warningElement.style.backgroundColor = '#fff3cd';
+                    warningElement.style.color = '#856404';
+                    warningElement.style.padding = '1rem';
+                    warningElement.style.marginBottom = '2rem';
+                    warningElement.style.borderRadius = '5px';
+                    warningElement.style.fontSize = '1.6rem';
+                    warningElement.textContent = 'Warning: Email service not properly loaded. Contact functionality may be limited.';
+
+                    // Insert as the first child of the form container
+                    if (formElement && formElement.firstChild) {
+                        formElement.insertBefore(warningElement, formElement.firstChild);
+                    }
+                } else {
+                    // Initialize with your public key - IMPORTANT: Make sure this is your correct public key
+                    emailjs.init("im30KdQmsnkMTfWmm");
+                    console.log("EmailJS initialized successfully");
+                }
+            } catch (error) {
+                console.error("Error initializing EmailJS:", error);
+            }
+        })();
+
+        // Character counter for message textarea
+        const messageTextarea = document.getElementById('message');
+        const charCountSpan = document.getElementById('charCount');
+        const charCounter = charCountSpan.parentElement;
+
+        messageTextarea.addEventListener('input', function () {
+            const currentLength = this.value.length;
+            charCountSpan.textContent = currentLength;
+
+            // Update counter color based on remaining characters
+            if (currentLength >= 1800 && currentLength <= 2000) {
+                charCounter.className = 'char-counter limit-near';
+            } else if (currentLength > 2000) {
+                charCounter.className = 'char-counter limit-reached';
+            } else {
+                charCounter.className = 'char-counter';
+            }
+        });
+
+        // Email validation function
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            return emailRegex.test(email);
+        }
+
+        // Get form elements
+        const contactForm = document.getElementById('contactForm');
+        const emailInput = document.getElementById('email');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const messageInput = document.getElementById('message');
+        const submitBtn = document.querySelector('.submit-btn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const successMessage = document.getElementById('successMessage');
+
+        // Add validation message elements
+        const createValidationMsg = (inputElement) => {
+            // Check if validation message already exists
+            const existingMsg = inputElement.parentNode.querySelector('.validation-message');
+            if (existingMsg) return existingMsg;
+
+            const validationMsg = document.createElement('div');
+            validationMsg.className = 'validation-message';
+            validationMsg.style.fontSize = '1.4rem';
+            validationMsg.style.marginTop = '0.5rem';
+            validationMsg.style.display = 'none';
+            inputElement.parentNode.insertBefore(validationMsg, inputElement.nextSibling);
+            return validationMsg;
+        };
+
+        const emailValidationMsg = createValidationMsg(emailInput);
+        const firstNameValidationMsg = createValidationMsg(firstNameInput);
+        const lastNameValidationMsg = createValidationMsg(lastNameInput);
+        const messageValidationMsg = createValidationMsg(messageTextarea);
+
+        // Field validation event listeners
+        emailInput.addEventListener('blur', function () { validateField(this, emailValidationMsg, validateEmail); });
+        emailInput.addEventListener('input', function () {
+            if (emailValidationMsg.style.display !== 'none') {
+                validateField(this, emailValidationMsg, validateEmail);
+            }
+        });
+
+        firstNameInput.addEventListener('blur', function () { validateField(this, firstNameValidationMsg, validateName); });
+        firstNameInput.addEventListener('input', function () {
+            if (firstNameValidationMsg.style.display !== 'none') {
+                validateField(this, firstNameValidationMsg, validateName);
+            }
+        });
+
+        lastNameInput.addEventListener('blur', function () { validateField(this, lastNameValidationMsg, validateName); });
+        lastNameInput.addEventListener('input', function () {
+            if (lastNameValidationMsg.style.display !== 'none') {
+                validateField(this, lastNameValidationMsg, validateName);
+            }
+        });
+
+        messageInput.addEventListener('blur', function () { validateField(this, messageValidationMsg, validateMessage); });
+        messageInput.addEventListener('input', function () {
+            if (messageValidationMsg.style.display !== 'none') {
+                validateField(this, messageValidationMsg, validateMessage);
+            }
+        });
+
+        // Generic field validation function
+        function validateField(inputElement, msgElement, validationFn) {
+            const value = inputElement.value.trim();
+
+            // Skip validation if field is empty (we'll catch that on submit)
+            if (value === '') {
+                msgElement.style.display = 'none';
+                inputElement.style.borderColor = '';
+                return;
+            }
+
+            return validationFn(inputElement, msgElement);
+        }
+
+        // Name validation function
+        function validateName(inputElement, msgElement) {
+            const value = inputElement.value.trim();
+
+            if (value.length < 1) {
+                msgElement.textContent = 'This field is required';
+                msgElement.style.color = '#ff0000';
+                msgElement.style.display = 'block';
+                inputElement.style.borderColor = '#ff0000';
+                inputElement.style.borderWidth = '1px';
+                inputElement.style.borderStyle = 'solid';
+                return false;
+            } else {
+                msgElement.style.display = 'none';
+                inputElement.style.borderColor = '';
+                return true;
+            }
+        }
+
+        // Message validation function
+        function validateMessage(inputElement, msgElement) {
+            const value = inputElement.value.trim();
+
+            if (value.length < 1) {
+                msgElement.textContent = 'Please enter a message';
+                msgElement.style.color = '#ff0000';
+                msgElement.style.display = 'block';
+                inputElement.style.borderColor = '#ff0000';
+                inputElement.style.borderWidth = '1px';
+                inputElement.style.borderStyle = 'solid';
+                return false;
+            } else if (value.length > 2000) {
+                msgElement.textContent = 'Message is too long (maximum 2000 characters)';
+                msgElement.style.color = '#ff0000';
+                msgElement.style.display = 'block';
+                inputElement.style.borderColor = '#ff0000';
+                inputElement.style.borderWidth = '1px';
+                inputElement.style.borderStyle = 'solid';
+                return false;
+            } else {
+                msgElement.style.display = 'none';
+                inputElement.style.borderColor = '';
+                return true;
+            }
+        }
+
+        // Email validation function
+        function validateEmail() {
+            const email = emailInput.value.trim();
+
+            // Skip validation if field is empty (we'll catch that on submit)
+            if (email === '') {
+                emailValidationMsg.style.display = 'none';
+                emailInput.style.borderColor = '';
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                // Provide more specific error messages for common mistakes
+                if (email.includes('@gmail') && !email.includes('@gmail.com')) {
+                    emailValidationMsg.textContent = 'Did you mean @gmail.com?';
+                } else if (!email.includes('@')) {
+                    emailValidationMsg.textContent = 'Email must contain @ symbol';
+                } else if (!email.includes('.')) {
+                    emailValidationMsg.textContent = 'Email must include a domain (.com, .org, etc.)';
+                } else {
+                    emailValidationMsg.textContent = 'Please enter a valid email address';
+                }
+
+                emailValidationMsg.style.color = '#ff0000';
+                emailValidationMsg.style.display = 'block';
+                emailInput.style.borderColor = '#ff0000';
+                emailInput.style.borderWidth = '1px';
+                emailInput.style.borderStyle = 'solid';
+                return false;
+            } else {
+                emailValidationMsg.textContent = 'Valid email format';
+                emailValidationMsg.style.color = '#4CAF50';
+                emailValidationMsg.style.display = 'block';
+                emailInput.style.borderColor = '#4CAF50';
+                emailInput.style.borderWidth = '1px';
+                emailInput.style.borderStyle = 'solid';
+                return true;
+            }
+        }
+
+        // Add a retry mechanism for EmailJS
+        function sendEmailWithRetry(templateParams, maxRetries = 2) {
+            return new Promise((resolve, reject) => {
+                let retries = 0;
+
+                // If we're on localhost, simulate success for testing
+                if (isLocalhost) {
+                    console.log("Localhost environment detected - simulating successful email send");
+                    setTimeout(() => {
+                        resolve({
+                            status: 200,
+                            text: "Simulated success in localhost environment"
+                        });
+                    }, 1500); // Simulate network delay
+                    return;
+                }
+
+                function attemptSend() {
+                    console.log(`Attempt ${retries + 1} to send email`);
+
+                    emailjs.send('service_b2bu7gp', 'template_zo8v4ca', templateParams)
+                        .then(response => {
+                            console.log('SUCCESS!', response.status, response.text);
+                            resolve(response);
+                        })
+                        .catch(error => {
+                            console.log(`Attempt ${retries + 1} FAILED...`, error);
+
+                            if (retries < maxRetries) {
+                                retries++;
+                                console.log(`Retrying... (${retries}/${maxRetries})`);
+                                setTimeout(attemptSend, 1000); // Wait 1 second before retry
+                            } else {
+                                console.log('All retries failed');
+                                reject(error);
+                            }
+                        });
+                }
+
+                attemptSend();
+            });
+        }
+
+        // Add server response error message element
+        let errorMessageElement = document.getElementById('errorMessage');
+        if (!errorMessageElement) {
+            errorMessageElement = document.createElement('div');
+            errorMessageElement.id = 'errorMessage';
+            errorMessageElement.className = 'error-message';
+            errorMessageElement.style.backgroundColor = '#ff6b6b';
+            errorMessageElement.style.color = 'white';
+            errorMessageElement.style.padding = '1.5rem';
+            errorMessageElement.style.borderRadius = '8px';
+            errorMessageElement.style.textAlign = 'center';
+            errorMessageElement.style.fontSize = '1.8rem';
+            errorMessageElement.style.marginTop = '2rem';
+            errorMessageElement.style.display = 'none';
+            contactForm.appendChild(errorMessageElement);
+        }
+
+        contactForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get form values
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const email = emailInput.value.trim();
+            const message = messageInput.value.trim();
+
+            // Check required fields
+            let isValid = true;
+
+            // Validate first name
+            if (firstName === '') {
+                firstNameValidationMsg.textContent = 'First name is required';
+                firstNameValidationMsg.style.color = '#ff0000';
+                firstNameValidationMsg.style.display = 'block';
+                firstNameInput.style.borderColor = '#ff0000';
+                firstNameInput.style.borderWidth = '1px';
+                firstNameInput.style.borderStyle = 'solid';
+                isValid = false;
+            } else {
+                firstNameValidationMsg.style.display = 'none';
+                firstNameInput.style.borderColor = '';
+            }
+
+            // Validate last name
+            if (lastName === '') {
+                lastNameValidationMsg.textContent = 'Last name is required';
+                lastNameValidationMsg.style.color = '#ff0000';
+                lastNameValidationMsg.style.display = 'block';
+                lastNameInput.style.borderColor = '#ff0000';
+                lastNameInput.style.borderWidth = '1px';
+                lastNameInput.style.borderStyle = 'solid';
+                isValid = false;
+            } else {
+                lastNameValidationMsg.style.display = 'none';
+                lastNameInput.style.borderColor = '';
+            }
+
+            // Validate email
+            if (email === '') {
+                emailValidationMsg.textContent = 'Email is required';
+                emailValidationMsg.style.color = '#ff0000';
+                emailValidationMsg.style.display = 'block';
+                emailInput.style.borderColor = '#ff0000';
+                emailInput.style.borderWidth = '1px';
+                emailInput.style.borderStyle = 'solid';
+                isValid = false;
+            } else {
+                isValid = validateEmail() && isValid;
+            }
+
+            // Validate message
+            if (message === '') {
+                messageValidationMsg.textContent = 'Message is required';
+                messageValidationMsg.style.color = '#ff0000';
+                messageValidationMsg.style.display = 'block';
+                messageInput.style.borderColor = '#ff0000';
+                messageInput.style.borderWidth = '1px';
+                messageInput.style.borderStyle = 'solid';
+                isValid = false;
+            } else if (message.length > 2000) {
+                messageValidationMsg.textContent = 'Message is too long (maximum 2000 characters)';
+                messageValidationMsg.style.color = '#ff0000';
+                messageValidationMsg.style.display = 'block';
+                messageInput.style.borderColor = '#ff0000';
+                messageInput.style.borderWidth = '1px';
+                messageInput.style.borderStyle = 'solid';
+                isValid = false;
+            } else {
+                messageValidationMsg.style.display = 'none';
+                messageInput.style.borderColor = '';
+            }
+
+            // If form is valid, submit it via EmailJS
+            if (isValid) {
+                try {
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'inline-block';
+                    submitBtnText.textContent = 'SENDING...';
+                    submitBtn.disabled = true;
+
+                    // Hide any previous error message
+                    errorMessageElement.style.display = 'none';
+
+                    // Prepare template parameters
+                    const templateParams = {
+                        from_name: `${firstName} ${lastName}`,
+                        from_email: email,
+                        message: message
+                    };
+
+                    console.log("Attempting to send email with params:", templateParams);
+
+                    // Set timeout for the request to prevent indefinite loading
+                    const timeoutPromise = new Promise((_, reject) => {
+                        setTimeout(() => reject(new Error('Request timed out')), 15000);
+                    });
+
+                    // Race between the EmailJS request and the timeout
+                    Promise.race([
+                        sendEmailWithRetry(templateParams, 2), // Try up to 3 times total (initial + 2 retries)
+                        timeoutPromise
+                    ])
+                        .then(function (response) {
+                            // Hide error message if visible
+                            errorMessageElement.style.display = 'none';
+
+                            // Hide loading spinner
+                            loadingSpinner.style.display = 'none';
+                            submitBtnText.textContent = 'SEND';
+                            submitBtn.disabled = false;
+
+                            // Show success message
+                            successMessage.style.display = 'block';
+
+                            // Reset form
+                            contactForm.reset();
+                            charCountSpan.textContent = '0';
+
+                            // Hide success message after 5 seconds
+                            setTimeout(() => {
+                                successMessage.style.display = 'none';
+                            }, 5000);
+                        })
+                        .catch(function (error) {
+                            console.log('FAILED...', error);
+
+                            // Hide loading spinner
+                            loadingSpinner.style.display = 'none';
+                            submitBtnText.textContent = 'SEND';
+                            submitBtn.disabled = false;
+
+                            // Show detailed error message
+                            let errorMsg = 'Failed to send message. ';
+
+                            if (error.message === 'Request timed out') {
+                                errorMsg += 'Request timed out. Please check your internet connection and try again.';
+                            } else if (error.status === 0) {
+                                errorMsg += 'Network error. Please check your internet connection.';
+                            } else if (error.status === 401 || error.status === 403) {
+                                errorMsg += 'Authentication error with email service. Please contact the site administrator.';
+                            } else if (error.status === 429) {
+                                errorMsg += 'Too many requests. Please try again later.';
+                            } else {
+                                errorMsg += 'Please try again later or contact the site administrator.';
+                            }
+
+                            errorMessageElement.textContent = errorMsg;
+                            errorMessageElement.style.display = 'block';
+
+                            // Hide error message after 10 seconds
+                            setTimeout(() => {
+                                errorMessageElement.style.display = 'none';
+                            }, 10000);
+                        });
+                } catch (unexpectedError) {
+                    // Catch any unexpected errors and reset the form state
+                    console.error("Unexpected error:", unexpectedError);
+
+                    loadingSpinner.style.display = 'none';
+                    submitBtnText.textContent = 'SEND';
+                    submitBtn.disabled = false;
+
+                    // Show error message for unexpected error
+                    errorMessageElement.textContent = "An unexpected error occurred. Please try again.";
+                    errorMessageElement.style.display = 'block';
+
+                    // Hide error message after 10 seconds
+                    setTimeout(() => {
+                        errorMessageElement.style.display = 'none';
+                    }, 10000);
+                }
+            }
+        });
+
+        // Check if the EmailJS library is loaded properly
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof emailjs === 'undefined') {
+                console.error("EmailJS library not loaded!");
+
+                // Add a script element to try loading EmailJS again
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
+                script.async = true;
+                script.onload = function () {
+                    console.log("EmailJS library loaded successfully!");
+                    if (typeof emailjs !== 'undefined') {
+                        emailjs.init("im30KdQmsnkMTfWmm");
+                    }
+                };
+                script.onerror = function () {
+                    console.error("Failed to load EmailJS library again!");
+                };
+                document.head.appendChild(script);
+            }
+        });
+    </script>
+</body>
+
+</html>
